@@ -1,6 +1,7 @@
 ﻿using AppKit;
 using Foundation;
 
+
 namespace PasswordGenerator
 {
     [Register("AppDelegate")]
@@ -21,3 +22,4 @@ namespace PasswordGenerator
         }
     }
 }
+
