@@ -729,7 +729,7 @@
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                                 <connections>
-                                    <action selector="App_Name:" target="XfG-lQ-9wD" id="Aqc-o5-QTM"/>
+                                    <action selector="AppNameInput:" target="XfG-lQ-9wD" id="or1-PT-W2I"/>
                                 </connections>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tg2-sN-4EQ">
@@ -759,7 +759,7 @@
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                                 <connections>
-                                    <action selector="Username_Input:" target="XfG-lQ-9wD" id="3vn-xA-5vA"/>
+                                    <action selector="UsernameInput:" target="XfG-lQ-9wD" id="aRH-cD-gHw"/>
                                 </connections>
                             </textField>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="WGG-rO-Exi">
@@ -770,7 +770,7 @@
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
                                 <connections>
-                                    <action selector="Generate_Password:" target="XfG-lQ-9wD" id="2ax-Ud-ijH"/>
+                                    <action selector="GeneratePasswordButton:" target="XfG-lQ-9wD" id="9ey-1Z-nKO"/>
                                 </connections>
                             </button>
                             <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vyV-Ae-Nik">
@@ -782,7 +782,7 @@
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                                 <connections>
-                                    <action selector="PasswordLen_Input:" target="XfG-lQ-9wD" id="MjH-dw-RWY"/>
+                                    <action selector="PasswordLengthInput:" target="XfG-lQ-9wD" id="8g1-fP-UoI"/>
                                 </connections>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="zOt-VM-wNK">
@@ -815,7 +815,7 @@
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
                                 <connections>
-                                    <action selector="AddEntry_button:" target="XfG-lQ-9wD" id="JYC-ER-LgQ"/>
+                                    <action selector="AddEntryButton:" target="XfG-lQ-9wD" id="nVi-Bi-Qpo"/>
                                 </connections>
                             </button>
                             <scrollView fixedFrame="YES" autohidesScrollers="YES" horizontalLineScroll="24" horizontalPageScroll="10" verticalLineScroll="24" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MYI-xc-ii6">
@@ -988,13 +988,16 @@
                         <viewLayoutGuide key="layoutMargins" id="cg0-T3-NBH"/>
                     </view>
                     <connections>
-                        <outlet property="AppNameColumn" destination="Kcd-xR-kiX" id="Q4h-PK-3AI"/>
+                        <outlet property="AppNameColumn" destination="Kcd-xR-kiX" id="0ek-x1-UfS"/>
                         <outlet property="CurrPassword_TextBox" destination="fPg-Hd-he5" id="yIE-zl-w9V"/>
-                        <outlet property="PasswordColumn" destination="aWC-WA-xLz" id="CyJ-ye-eRv"/>
+                        <outlet property="PasswordColumn" destination="aWC-WA-xLz" id="vcj-Qa-ALb"/>
+                        <outlet property="PasswordDIsplay" destination="oDf-mz-GKn" id="4HU-bg-mbs"/>
+                        <outlet property="PasswordDisplay" destination="fPg-Hd-he5" id="8uV-QQ-kAU"/>
                         <outlet property="PasswordScroll" destination="vFb-9h-LLn" id="rtp-Qy-QEH"/>
-                        <outlet property="Table" destination="MYI-xc-ii6" id="0Cl-N4-1oU"/>
+                        <outlet property="Table" destination="cBP-0J-Q95" id="fO6-Mj-AUZ"/>
+                        <outlet property="TableDisplay" destination="cBP-0J-Q95" id="ZuH-kk-wEO"/>
                         <outlet property="Test_Press" destination="42G-0G-GwM" id="k2t-1F-STi"/>
-                        <outlet property="UsernameColumn" destination="MYI-xc-ii6" id="olq-Fe-VDQ"/>
+                        <outlet property="UsernameColumn" destination="Lci-SZ-L5Y" id="IH5-ni-Gg1"/>
                     </connections>
                 </viewController>
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>

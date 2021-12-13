@@ -13,71 +13,36 @@ namespace PasswordGenerator
 	partial class ViewController
 	{
 		[Outlet]
-		AppKit.NSTableColumn AppNameColumn { get; set; }
+		AppKit.NSTextView PasswordDisplay { get; set; }
 
 		[Outlet]
-		AppKit.NSTextView CurrPassword_TextBox { get; set; }
+		AppKit.NSTableView TableDisplay { get; set; }
 
-		[Outlet]
-		AppKit.NSTableColumn PasswordColumn { get; set; }
+		[Action ("AddEntryButton:")]
+		partial void AddEntryButton (AppKit.NSButton sender);
 
-		[Outlet]
-		AppKit.NSScroller PasswordScroll { get; set; }
+		[Action ("AppNameInput:")]
+		partial void AppNameInput (AppKit.NSTextField sender);
 
-		[Outlet]
-		AppKit.NSScrollView Table { get; set; }
+		[Action ("GeneratePasswordButton:")]
+		partial void GeneratePasswordButton (AppKit.NSButton sender);
 
-		[Outlet]
-		AppKit.NSScrollView UsernameColumn { get; set; }
+		[Action ("PasswordLengthInput:")]
+		partial void PasswordLengthInput (AppKit.NSTextField sender);
 
-		[Action ("AddEntry_button:")]
-		partial void AddEntry_button (AppKit.NSButton sender);
-
-		[Action ("App_Name:")]
-		partial void App_Name (AppKit.NSTextField sender);
-
-		[Action ("Generate_Password:")]
-		partial void Generate_Password (AppKit.NSButton sender);
-
-		[Action ("PasswordLen_Input:")]
-		partial void PasswordLen_Input (AppKit.NSTextField sender);
-
-		[Action ("Press:")]
-		partial void Press (AppKit.NSButton sender);
-
-		[Action ("Username_Input:")]
-		partial void Username_Input (AppKit.NSTextField sender);
+		[Action ("UsernameInput:")]
+		partial void UsernameInput (AppKit.NSTextField sender);
 		
 		void ReleaseDesignerOutlets ()
 		{
-			if (CurrPassword_TextBox != null) {
-				CurrPassword_TextBox.Dispose ();
-				CurrPassword_TextBox = null;
+			if (PasswordDisplay != null) {
+				PasswordDisplay.Dispose ();
+				PasswordDisplay = null;
 			}
 
-			if (PasswordScroll != null) {
-				PasswordScroll.Dispose ();
-				PasswordScroll = null;
-			}
-
-			if (Table != null) {
-				Table.Dispose ();
-				Table = null;
-			}
-
-			if (AppNameColumn != null) {
-				AppNameColumn.Dispose ();
-				AppNameColumn = null;
-			}
-
-			if (UsernameColumn != null) {
-				UsernameColumn.Dispose ();
-				UsernameColumn = null;
-			}
-
-			if (PasswordColumn != null) {
-				PasswordColumn.Dispose ();
-				PasswordColumn = null;
+			if (TableDisplay != null) {
+				TableDisplay.Dispose ();
+				TableDisplay = null;
 			}
 		}
 	}

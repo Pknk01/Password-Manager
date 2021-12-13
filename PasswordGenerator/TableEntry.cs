@@ -1,7 +1,7 @@
 ﻿using System;
 using AppKit;
 
-namespace PasswordGenerator.CustomClasses
+namespace PasswordGenerator
 {
     public class TableEntry
     {
@@ -18,6 +18,6 @@ namespace PasswordGenerator.CustomClasses
             this.Entry_Password = Password;
         }
 
-        public TableEntry() {} //Possible alternative method with no inputs, no really sure, leaving here to avoid issues
+        public TableEntry() {} //Possible alternative method with no inputs, not really sure, leaving here to avoid issues
     }
 }

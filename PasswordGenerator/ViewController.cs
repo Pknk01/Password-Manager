@@ -19,18 +19,21 @@ namespace PasswordGenerator
 
         static string Added_App_Name = "";
         static string App_Username = "";
-        static string Password = "";
+        static string CurrPassword = "";
+
+        TableDataSource DataSource = new TableDataSource();
 
         // ---- Default Methods ----
 
         public ViewController(IntPtr handle) : base(handle)
         {
-        }
+        }    
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
 
             // Do any additional setup after loading the view.
+
         }
         public override NSObject RepresentedObject
         {
@@ -45,15 +48,22 @@ namespace PasswordGenerator
             }
         }
 
+        public override void AwakeFromNib()
+        {
+            base.AwakeFromNib();
+                        
+            TableDisplay.Delegate = new TableDelegate(DataSource); 
+        }
+
         // ---- Password Generation ----
 
-        partial void PasswordLen_Input(NSTextField sender)
+        partial void PasswordLengthInput(NSTextField sender)
         {
             Passlength = sender.IntValue; //Saves UI input to variable
         }
 
         /// <Summary> Creates a random password with the character set of X length <Summary/>
-        partial void Generate_Password(NSButton sender)
+        partial void GeneratePasswordButton(NSButton sender)
         {
             if(Passlength.Equals(null) || Passlength <= 0) //Nullcheck and if password length <= 0
             {
@@ -81,50 +91,51 @@ namespace PasswordGenerator
 
             //Hides scroll bar on text box if necessary cuz of password length
 
-            if(output.Length >= scrollthreshold) { 
-                PasswordScroll.Hidden = false; } //shows
-            else { 
-                PasswordScroll.Hidden = true; } //hides 
+            //if(output.Length >= scrollthreshold) { 
+                //PasswordScroll.Hidden = false; } //shows
+            //else { 
+                //PasswordScroll.Hidden = true; } //hides 
             
-            Password = output;  //Saves variable
-            CurrPassword_TextBox.Value = output;
+            CurrPassword = output;  //Saves variable
+            
+            PasswordDisplay.Value = output;
         }
 
         // --- Adding Table Entry ----
 
-        partial void App_Name(NSTextField sender)
+        partial void AppNameInput(NSTextField sender)
         {
-            if(sender.StringValue.Equals(null)) { return; } //Nullcheck
             Added_App_Name = sender.StringValue;    //Saves UI input to Variable
         }
 
-        partial void Username_Input(NSTextField sender)
+        partial void UsernameInput(NSTextField sender)
         {
-            if(sender.StringValue.Equals(null)) { return; } //Nullcheck
             App_Username = sender.StringValue;      //Saves UI input to Variable
         }
 
         //Adds entry into password manager
-        partial void AddEntry_button(NSButton sender)
+        partial void AddEntryButton(NSButton sender)
         {
-            if(Added_App_Name.Equals("") || App_Username.Equals("") || Password.Equals("")) //Empty checking
+            if(Added_App_Name.Equals("") || App_Username.Equals("") || CurrPassword.Equals("")) //Empty checking
             {
-
                 //Alert for missinput
-                NSAlert Alert = new NSAlert()
+                NSAlert ErrAlert = new NSAlert()
                 {
                     AlertStyle = NSAlertStyle.Warning,
                     MessageText = "Invalid Input",
                     InformativeText = "Missing one or more inputs to add entry",
                 };
 
-                Alert.RunModal();
+                ErrAlert.RunModal();   //Displays Alert in window
                 return;
             }
 
-            
+            //Creates Entry with information previously present
+            DataSource.Entry.Add(new TableEntry(Added_App_Name, App_Username, CurrPassword));
+            TableDisplay.DataSource = DataSource;
+            TableDisplay.ReloadData();  //Refresh Table
 
-
+            Console.WriteLine("Entry Button Pressed");
         }
     }
 }
