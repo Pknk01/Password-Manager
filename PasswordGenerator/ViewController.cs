@@ -2,6 +2,7 @@
 using System.IO;
 using AppKit;
 using Foundation;
+using System.Security.Cryptography;
 
 namespace PasswordGenerator
 {
@@ -20,6 +21,15 @@ namespace PasswordGenerator
         static string Added_App_Name = "";
         static string App_Username = "";
         static string CurrPassword = "";
+
+        #region Encryption Key
+
+            byte[] Key = 
+            {
+                0x49, 0x20, 0x61, 0x6d, 0x20, 0x61, 0x20, 0x6e, 0x65, 0x72, 0x64
+            };
+
+        #endregion
 
         TableDataSource DataSource = new TableDataSource();
 
@@ -52,6 +62,7 @@ namespace PasswordGenerator
         {
             base.AwakeFromNib();
                         
+            TableDisplay.DataSource = DataSource;
             TableDisplay.Delegate = new TableDelegate(DataSource); 
         }
 
@@ -91,10 +102,10 @@ namespace PasswordGenerator
 
             //Hides scroll bar on text box if necessary cuz of password length
 
-            //if(output.Length >= scrollthreshold) { 
-                //PasswordScroll.Hidden = false; } //shows
-            //else { 
-                //PasswordScroll.Hidden = true; } //hides 
+            if(output.Length >= scrollthreshold) { 
+                ScrollerWheel.Hidden = false; } //shows
+            else { 
+                ScrollerWheel.Hidden = true; } //hides 
             
             CurrPassword = output;  //Saves variable
             
@@ -132,10 +143,73 @@ namespace PasswordGenerator
 
             //Creates Entry with information previously present
             DataSource.Entry.Add(new TableEntry(Added_App_Name, App_Username, CurrPassword));
-            TableDisplay.DataSource = DataSource;
             TableDisplay.ReloadData();  //Refresh Table
 
             Console.WriteLine("Entry Button Pressed");
         }
+
+        #region Password encryption Region
+
+        private void PasswordStorage()
+        {
+            //https://docs.microsoft.com/en-us/dotnet/standard/security/encrypting-data
+
+            using(FileStream stream = new FileStream("PasswordDump.txt", FileMode.OpenOrCreate)) //Creates or opens file storing documents
+            {
+                using (Aes Instance = Aes.Create()) //creates AES encryption instance
+                {
+                    Instance.Key = Key; //Sets global key as instance
+
+                    byte[] iv = Instance.IV; //encryption initialization vector  (starting conditions)
+                    stream.Write(iv, 0, iv.Length); //no idea what this does ._. https://docs.microsoft.com/en-us/dotnet/api/system.io.filestream.write?view=net-6.0
+
+                    using(CryptoStream cryptostream = new CryptoStream(stream, Instance.CreateEncryptor(), CryptoStreamMode.Write))
+                    {
+                        using(StreamWriter encryptwriter = new StreamWriter(cryptostream))
+                        {
+
+                            //Todo Dump all passwords through here
+
+
+                            encryptwriter.WriteLine(CurrPassword); //Writes into file i think?
+                        }
+                    } 
+                }
+            }
+        }
+
+        private void PasswordReading()
+        {
+            using(FileStream stream = new FileStream("PasswordDump.txt", FileMode.OpenOrCreate))
+            {
+                using(Aes Instance = Aes.Create())  //AES encryption intance
+                {
+                    byte[] iv = Instance.IV; //Encryption inizalization vector (starting conditions)
+                    int numBytesToRead = Instance.IV.Length;
+                    int numBytesRead = 0;
+
+                    while (numBytesToRead > 0)
+                    {
+                        int n = stream.Read(iv, numBytesRead, numBytesToRead);
+                        if (n == 0) { break; }
+
+                        numBytesRead += n;
+                        numBytesToRead -= n;
+                    }
+
+                    using (CryptoStream cryptoStream = new CryptoStream(stream, Instance.CreateDecryptor(Key, iv), CryptoStreamMode.Read))
+                    {
+                        using(StreamReader decryptReader = new StreamReader(cryptoStream))
+                        {
+                            //Todo Get all passwords from here
+
+                            string DecryptedMessage = decryptReader.ReadToEnd();
+                            Console.WriteLine("Decrypted message: " + DecryptedMessage);
+                        }
+                    }
+                }
+            }
+        }
+        #endregion
     }
 }
