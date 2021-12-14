@@ -38,12 +38,14 @@ namespace PasswordGenerator
         public ViewController(IntPtr handle) : base(handle)
         {
         }    
+        
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
 
             // Do any additional setup after loading the view.
 
+            PasswordReading(); //Call file Read method
         }
         public override NSObject RepresentedObject
         {
@@ -134,7 +136,7 @@ namespace PasswordGenerator
                 {
                     AlertStyle = NSAlertStyle.Warning,
                     MessageText = "Invalid Input",
-                    InformativeText = "Missing one or more inputs to add entry",
+                    InformativeText = "Missing inputs or duplicate input",
                 };
 
                 ErrAlert.RunModal();   //Displays Alert in window
@@ -144,8 +146,13 @@ namespace PasswordGenerator
             //Creates Entry with information previously present
             DataSource.Entry.Add(new TableEntry(Added_App_Name, App_Username, CurrPassword));
             TableDisplay.ReloadData();  //Refresh Table
+            PasswordStorage(); //Storing Current Password
 
-            Console.WriteLine("Entry Button Pressed");
+            /// --- clearing variables ---
+            Added_App_Name = "";
+            App_Username = "";
+            CurrPassword = "";
+
         }
 
         #region Password encryption Region
@@ -154,60 +161,73 @@ namespace PasswordGenerator
         {
             //https://docs.microsoft.com/en-us/dotnet/standard/security/encrypting-data
 
-            using(FileStream stream = new FileStream("PasswordDump.txt", FileMode.OpenOrCreate)) //Creates or opens file storing documents
-            {
-                using (Aes Instance = Aes.Create()) //creates AES encryption instance
+            try
+            {            
+                using(FileStream stream = new FileStream("PasswordDump.txt", FileMode.OpenOrCreate)) //Creates or opens file storing documents
                 {
-                    Instance.Key = Key; //Sets global key as instance
-
-                    byte[] iv = Instance.IV; //encryption initialization vector  (starting conditions)
-                    stream.Write(iv, 0, iv.Length); //no idea what this does ._. https://docs.microsoft.com/en-us/dotnet/api/system.io.filestream.write?view=net-6.0
-
-                    using(CryptoStream cryptostream = new CryptoStream(stream, Instance.CreateEncryptor(), CryptoStreamMode.Write))
+                    using (Aes Instance = Aes.Create()) //creates AES encryption instance
                     {
-                        using(StreamWriter encryptwriter = new StreamWriter(cryptostream))
+                        Instance.Key = Key; //Sets global key as instance
+
+                        byte[] iv = Instance.IV; //encryption initialization vector  (starting conditions)
+                        stream.Write(iv, 0, iv.Length); //no idea what this does ._. https://docs.microsoft.com/en-us/dotnet/api/system.io.filestream.write?view=net-6.0
+
+                        using(CryptoStream cryptostream = new CryptoStream(stream, Instance.CreateEncryptor(), CryptoStreamMode.Write))
                         {
+                            using(StreamWriter encryptwriter = new StreamWriter(cryptostream))
+                            {
 
-                            //Todo Dump all passwords through here
+                                //Todo Dump all passwords through here
 
-
-                            encryptwriter.WriteLine(CurrPassword); //Writes into file i think?
-                        }
-                    } 
+                                encryptwriter.WriteLine(CurrPassword); //Writes into file i think?
+                            }
+                        } 
+                    }
                 }
+            }
+            catch (Exception err)
+            {
+                Console.WriteLine("encryption storage error: " + err);
             }
         }
 
         private void PasswordReading()
         {
-            using(FileStream stream = new FileStream("PasswordDump.txt", FileMode.OpenOrCreate))
+            try
             {
-                using(Aes Instance = Aes.Create())  //AES encryption intance
+                using(FileStream stream = new FileStream("PasswordDump.txt", FileMode.OpenOrCreate))
                 {
-                    byte[] iv = Instance.IV; //Encryption inizalization vector (starting conditions)
-                    int numBytesToRead = Instance.IV.Length;
-                    int numBytesRead = 0;
-
-                    while (numBytesToRead > 0)
+                    using(Aes Instance = Aes.Create())  //AES encryption intance
                     {
-                        int n = stream.Read(iv, numBytesRead, numBytesToRead);
-                        if (n == 0) { break; }
+                        byte[] iv = Instance.IV; //Encryption inizalization vector (starting conditions)
+                        int numBytesToRead = Instance.IV.Length;
+                        int numBytesRead = 0;
 
-                        numBytesRead += n;
-                        numBytesToRead -= n;
-                    }
-
-                    using (CryptoStream cryptoStream = new CryptoStream(stream, Instance.CreateDecryptor(Key, iv), CryptoStreamMode.Read))
-                    {
-                        using(StreamReader decryptReader = new StreamReader(cryptoStream))
+                        while (numBytesToRead > 0)
                         {
-                            //Todo Get all passwords from here
+                            int n = stream.Read(iv, numBytesRead, numBytesToRead);
+                            if (n == 0) { break; }
 
-                            string DecryptedMessage = decryptReader.ReadToEnd();
-                            Console.WriteLine("Decrypted message: " + DecryptedMessage);
+                            numBytesRead += n;
+                            numBytesToRead -= n;
+                        }
+
+                        using (CryptoStream cryptoStream = new CryptoStream(stream, Instance.CreateDecryptor(Key, iv), CryptoStreamMode.Read))
+                        {
+                            using(StreamReader decryptReader = new StreamReader(cryptoStream))
+                            {
+                                //Todo Get all passwords from here
+
+                                string DecryptedMessage = decryptReader.ReadToEnd();
+                                Console.WriteLine("Decrypted message: " + DecryptedMessage);
+                            }
                         }
                     }
                 }
+            }
+            catch (Exception err)
+            {
+                Console.WriteLine("Encryption reading failed: " + err);
             }
         }
         #endregion
