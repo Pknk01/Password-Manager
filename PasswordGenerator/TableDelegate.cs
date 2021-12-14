@@ -36,11 +36,8 @@ namespace PasswordGenerator
                 view.Selectable = true;
                 view.Editable = false;
             }
-
             //Adding To The Table
-
             string consoleOut = "";
-
             switch(tableColumn.Title) {
                 case "App":
                     consoleOut += (" Adding to App column: " + DataSource.Entry[(int)row].Entry_AppName);
@@ -53,7 +50,7 @@ namespace PasswordGenerator
                     break;
 
                 case "Password":
-                    consoleOut +=(" Adding to Password column: " + DataSource.Entry[(int)row].Entry_Password);
+                    consoleOut +=(" Adding to Password column: " + DataSource.Entry[(int)row].Entry_Password + "\n");
                     view.StringValue = DataSource.Entry[(int)row].Entry_Password;
                     break;
                 
@@ -62,8 +59,7 @@ namespace PasswordGenerator
                     break;
             }
             
-            Console.WriteLine(consoleOut + "\n");
-
+            Console.WriteLine(consoleOut);
             return view;
         }
     }

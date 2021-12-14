@@ -16,6 +16,9 @@ namespace PasswordGenerator
 		AppKit.NSTextView PasswordDisplay { get; set; }
 
 		[Outlet]
+		AppKit.NSScroller ScrollerWheel { get; set; }
+
+		[Outlet]
 		AppKit.NSTableView TableDisplay { get; set; }
 
 		[Action ("AddEntryButton:")]
@@ -43,6 +46,11 @@ namespace PasswordGenerator
 			if (TableDisplay != null) {
 				TableDisplay.Dispose ();
 				TableDisplay = null;
+			}
+
+			if (ScrollerWheel != null) {
+				ScrollerWheel.Dispose ();
+				ScrollerWheel = null;
 			}
 		}
 	}
