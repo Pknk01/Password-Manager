@@ -714,7 +714,7 @@
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fc1-oJ-g2R">
                                 <rect key="frame" x="61" y="226" width="142" height="35"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="New Password" id="qRY-bV-qKn">
+                                <textFieldCell key="cell" lineBreakMode="truncatingTail" alignment="center" title="New Password" id="qRY-bV-qKn">
                                     <font key="font" metaFont="system" size="18"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>

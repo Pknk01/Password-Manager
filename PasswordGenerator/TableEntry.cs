@@ -3,6 +3,7 @@ using AppKit;
 
 namespace PasswordGenerator
 {
+    [Serializable]
     public class TableEntry
     {
         // --- Variables ---

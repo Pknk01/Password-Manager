@@ -2,7 +2,10 @@
 using System.IO;
 using AppKit;
 using Foundation;
-using System.Security.Cryptography;
+using System.Collections.Generic;
+using System.Collections;
+using System.Linq;
+using System.Xml.Linq;
 
 namespace PasswordGenerator
 {
@@ -22,16 +25,14 @@ namespace PasswordGenerator
         static string App_Username = "";
         static string CurrPassword = "";
 
-        #region Encryption Key
+        // ---- Serialization variables ----
 
-            byte[] Key = 
-            {
-                0x49, 0x20, 0x61, 0x6d, 0x20, 0x61, 0x20, 0x6e, 0x65, 0x72, 0x64
-            };
+        private string storagefilename = "/SerializedAppData.xml";
+        List<TableEntry> serializationlist = new List<TableEntry>();
 
-        #endregion
 
         TableDataSource DataSource = new TableDataSource();
+
 
         // ---- Default Methods ----
 
@@ -42,10 +43,10 @@ namespace PasswordGenerator
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
+            PasswordReading(); //Call file Read method
 
             // Do any additional setup after loading the view.
 
-            PasswordReading(); //Call file Read method
         }
         public override NSObject RepresentedObject
         {
@@ -144,7 +145,9 @@ namespace PasswordGenerator
             }
 
             //Creates Entry with information previously present
-            DataSource.Entry.Add(new TableEntry(Added_App_Name, App_Username, CurrPassword));
+            TableEntry Entry = new TableEntry(Added_App_Name, App_Username, CurrPassword);
+            DataSource.Entry.Add(Entry);
+            serializationlist.Add(Entry);
             TableDisplay.ReloadData();  //Refresh Table
             PasswordStorage(); //Storing Current Password
 
@@ -159,75 +162,46 @@ namespace PasswordGenerator
 
         private void PasswordStorage()
         {
-            //https://docs.microsoft.com/en-us/dotnet/standard/security/encrypting-data
+            // https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/serialization/how-to-write-object-data-to-an-xml-file
 
             try
-            {            
-                using(FileStream stream = new FileStream("PasswordDump.txt", FileMode.OpenOrCreate)) //Creates or opens file storing documents
-                {
-                    using (Aes Instance = Aes.Create()) //creates AES encryption instance
-                    {
-                        Instance.Key = Key; //Sets global key as instance
-
-                        byte[] iv = Instance.IV; //encryption initialization vector  (starting conditions)
-                        stream.Write(iv, 0, iv.Length); //no idea what this does ._. https://docs.microsoft.com/en-us/dotnet/api/system.io.filestream.write?view=net-6.0
-
-                        using(CryptoStream cryptostream = new CryptoStream(stream, Instance.CreateEncryptor(), CryptoStreamMode.Write))
-                        {
-                            using(StreamWriter encryptwriter = new StreamWriter(cryptostream))
-                            {
-
-                                //Todo Dump all passwords through here
-
-                                encryptwriter.WriteLine(CurrPassword); //Writes into file i think?
-                            }
-                        } 
-                    }
-                }
-            }
-            catch (Exception err)
             {
-                Console.WriteLine("encryption storage error: " + err);
+                TableEntry[] Entries = serializationlist.ToArray(); 
+
+                System.Xml.Serialization.XmlSerializer writer = new System.Xml.Serialization.XmlSerializer(Entries.GetType()); //Creates serializer object
+
+                var storage_path = System.IO.Directory.GetCurrentDirectory() + storagefilename; //targets application storage path as string
+
+                //Opens file if it exists, creates it if it doesn't
+                System.IO.FileStream Stream = File.Open(storage_path, FileMode.OpenOrCreate) ;
+                Console.WriteLine("Writing Filepath = " + storage_path); 
+
+                writer.Serialize(Stream, Entries); //Writes data to file
+                Stream.Close(); //Closes file
+            }
+            catch(Exception error)
+            {
+                Console.WriteLine("Writing IO error: " + error);
             }
         }
 
         private void PasswordReading()
-        {
+        {            
             try
             {
-                using(FileStream stream = new FileStream("PasswordDump.txt", FileMode.OpenOrCreate))
+                string storage_path = System.IO.Directory.GetCurrentDirectory() + storagefilename; //Gets target storage path as string
+                var entries = XDocument.Load(storage_path).Root.Elements().Select(y => y.Elements().ToDictionary(x => x.Name, x => x.Value)).ToArray(); //the hell???
+                Console.WriteLine("Reading Filepath = " + storage_path);
+
+                foreach(var entry in entries)
                 {
-                    using(Aes Instance = Aes.Create())  //AES encryption intance
-                    {
-                        byte[] iv = Instance.IV; //Encryption inizalization vector (starting conditions)
-                        int numBytesToRead = Instance.IV.Length;
-                        int numBytesRead = 0;
-
-                        while (numBytesToRead > 0)
-                        {
-                            int n = stream.Read(iv, numBytesRead, numBytesToRead);
-                            if (n == 0) { break; }
-
-                            numBytesRead += n;
-                            numBytesToRead -= n;
-                        }
-
-                        using (CryptoStream cryptoStream = new CryptoStream(stream, Instance.CreateDecryptor(Key, iv), CryptoStreamMode.Read))
-                        {
-                            using(StreamReader decryptReader = new StreamReader(cryptoStream))
-                            {
-                                //Todo Get all passwords from here
-
-                                string DecryptedMessage = decryptReader.ReadToEnd();
-                                Console.WriteLine("Decrypted message: " + DecryptedMessage);
-                            }
-                        }
-                    }
+                    TableEntry toadd = new TableEntry(entry["Entry_AppName"], entry["Entry_Username"], entry["Entry_Password"]);
+                    DataSource.Entry.Add(toadd);
                 }
             }
-            catch (Exception err)
+            catch (Exception error)
             {
-                Console.WriteLine("Encryption reading failed: " + err);
+                Console.WriteLine("Reading IO error:" + error);
             }
         }
         #endregion
